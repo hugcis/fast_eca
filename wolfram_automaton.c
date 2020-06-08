@@ -31,7 +31,7 @@ static int print_bits_spaced(int size, uint8_t a[2 * size], int par,
   return 0;
 }
 
-uint8_t element_at(autom_t* autom, size_t idx)
+uint8_t element_at(size_t idx, autom_t* autom)
 {
   return autom->grid[2 * idx + autom->par];
 }
