@@ -17,8 +17,7 @@ typedef struct autom_s {
 
 /** Update the automatong one step with the corresponding rule.
     (radius is 1 for ECAs)*/
-int update_step(size_t size, autom_t* autom, uint8_t* rule,
-                int states, int radius);
+int update_step(autom_t* autom, uint8_t* rule, int radius);
 
 /** Format the automaton to a buffer for printing */
 int print_autom(autom_t* autom, char* buf);

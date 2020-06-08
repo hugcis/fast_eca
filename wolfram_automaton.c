@@ -1,14 +1,24 @@
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <math.h>
 #include <inttypes.h>
 #include "wolfram_automaton.h"
-#include "utils/compress.h"
-#include "utils/utils.h"
 
+static uint32_t ipow(int base, int exp)
+{
+  uint32_t result = 1;
+  for (;;)
+    {
+      if (exp & 1)
+        result *= base;
+      exp >>= 1;
+      if (!exp)
+        break;
+      base *= base;
+    }
+
+  return result;
+}
 
 static int print_bits_spaced(int size, uint8_t a[2 * size], int par,
                       char buf[size + 1])
@@ -25,9 +35,10 @@ int print_autom(autom_t* autom, char* buf)
   return print_bits_spaced(autom->size, autom->grid, autom->par, buf);
 }
 
-int update_step(size_t size, autom_t* autom,
-                uint8_t* rule, int states, int radius)
+int update_step(autom_t* autom, uint8_t* rule, int radius)
 {
+  size_t size = autom->size;
+  int states = autom->states;
   for (size_t r = radius; r < size - radius; r++) {
     size_t c = 0;
     int mult = 1;
@@ -68,7 +79,7 @@ autom_t* create_automat(size_t size, int states)
 
   autom->states = states;
   autom->size = size;
-  autom->grid = calloc(size, sizeof(uint8_t));
+  autom->grid = calloc(2 * size, sizeof(uint8_t));
   autom->par = 0;
 
   return autom;
@@ -119,20 +130,3 @@ unsigned long number_from_rule(int states, size_t rule_size,
   }
   return count;
 }
-
-static void write_step(size_t size, size_t rule_size, uint8_t A[size],
-                       uint8_t rule[rule_size], int step, int states)
-{
-  FILE* steps_file;
-  char* steps_fname;
-  asprintf(&steps_fname, "steps/out%lu_%i.step",
-           number_from_rule(states, rule_size, rule), step);
-
-  steps_file = fopen(steps_fname, "w+");
-
-  char output_string[size + 1];
-  /* print_bits_spaced(size, A, output_string); */
-  fputs(output_string, steps_file);
-  fclose(steps_file);
-}
-
