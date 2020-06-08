@@ -57,7 +57,7 @@ Compile with the following command:
 gcc -O3 -o main main.c -I. fast_eca/wolfram_automaton.c
 ```
 
-And run (100 steps, rule 110)
+And run (Grid size 100, rule 110)
 ```
 ./main 100 110
 ```
