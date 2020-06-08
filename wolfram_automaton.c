@@ -7,15 +7,15 @@
 static uint32_t ipow(int base, int exp)
 {
   uint32_t result = 1;
-  for (;;)
-    {
-      if (exp & 1)
-        result *= base;
-      exp >>= 1;
-      if (!exp)
-        break;
-      base *= base;
-    }
+
+  for (;;) {
+    if (exp & 1)
+      result *= base;
+    exp >>= 1;
+    if (!exp)
+      break;
+    base *= base;
+  }
 
   return result;
 }
@@ -27,7 +27,13 @@ static int print_bits_spaced(int size, uint8_t a[2 * size], int par,
     buf[i] = a[2 * i + par] + '0';
   }
   buf[size] = '\0';
+
   return 0;
+}
+
+uint8_t element_at(autom_t* autom, size_t idx)
+{
+  return autom->grid[2 * idx + autom->par];
 }
 
 int print_autom(autom_t* autom, char* buf)
@@ -38,10 +44,12 @@ int print_autom(autom_t* autom, char* buf)
 int update_step(autom_t* autom, uint8_t* rule, int radius)
 {
   size_t size = autom->size;
-  int states = autom->states;
+  int states = autom->states, mult;
+  size_t c;
+
   for (size_t r = radius; r < size - radius; r++) {
-    size_t c = 0;
-    int mult = 1;
+    c = 0;
+    mult = 1;
     for (int w = radius; w >= -radius; w--) {
       c += autom->grid[2 * (r + w) + autom->par] * mult;
       mult *= states;
@@ -49,8 +57,8 @@ int update_step(autom_t* autom, uint8_t* rule, int radius)
     autom->grid[!autom->par + 2 * r] = rule[c];
   }
   for (size_t r = 0; r < (size_t)radius; r++) {
-    size_t c = 0;
-    int mult = 1;
+    c = 0;
+    mult = 1;
     for (int w = radius; w >= -radius; w--) {
       c += autom->grid[(2 * (r + w + size) + autom->par) %
                        (2 * size)] * mult;
@@ -59,8 +67,8 @@ int update_step(autom_t* autom, uint8_t* rule, int radius)
     autom->grid[!autom->par + 2 * r] = rule[c];
   }
   for (size_t r = size - radius; r < size; r++) {
-    size_t c = 0;
-    int mult = 1;
+    c = 0;
+    mult = 1;
     for (int w = radius; w >= -radius; w--) {
       c += autom->grid[(2 * (r + w) + autom->par) %
                        (2 * size)] * mult;
@@ -89,6 +97,7 @@ int init_automat(autom_t* autom, enum InitMode mode)
 {
   size_t size = autom->size;
   int states = autom->states;
+
   if (mode == ONE) {
     for (size_t i = 0; i < size; i++) {
       autom->grid[2 * i + autom->par] = 0;
@@ -104,6 +113,7 @@ int init_automat(autom_t* autom, enum InitMode mode)
       autom->grid[2 * i + autom->par] = rand() % states;
     }
   }
+
   return 0;
 }
 
@@ -112,9 +122,11 @@ uint8_t* rule_from_number(unsigned long rule_number, int states,
 {
   int rule_size = ipow(states, neighbors);
   uint8_t* rule = calloc(rule_size, sizeof(uint8_t));
+
   for (int i = 0; i < rule_size; ++i) {
     rule[i] = (rule_number / (ipow(states, i))) % states;
   }
+
   return rule;
 }
 
@@ -124,9 +136,11 @@ unsigned long number_from_rule(int states, size_t rule_size,
 {
   unsigned long count = 0;
   unsigned long mult = 1;
+
   for (size_t i = 0; i < rule_size; ++i) {
     count += rule[i] * mult;
     mult *= states;
   }
+
   return count;
 }

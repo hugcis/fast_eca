@@ -34,3 +34,6 @@ unsigned long number_from_rule(int states, size_t rule_size,
 int init_automat(autom_t* autom, enum InitMode mode);
 
 autom_t* create_automat(size_t size, int states);
+
+/** Get the element at index `idx` in the grid. */
+uint8_t element_at(size_t idx, autom_t* autom);
